@@ -10,13 +10,13 @@ class OpenAnalizeCSV():
         try:
             self.analizeFile()
         except:
-            print("Something went wrong. Verify the source file exists in", sourcePath, "and try running the script again") 
+            print("Something went wrong. Verify the source file exists in", self.sourcePath, "and try running the script again") #Nother printing methos that provides padding and is also easy
             traceback.print_exc()
             return
         try:
             self.printAndOutputFile()                                                                                                                                     
         except:
-            print("Something went wrong. Verify the source file exists in", sourcePath, ", also verify you do not have the file", destPathFile , "open and try running the script again") 
+            print(f"Something went wrong. Verify the source file exists in {self.sourcePath}, also verify you do not have the file {self.destPathFile} open if it already exists and try running the script again") 
             traceback.print_exc()
             return
 
@@ -66,7 +66,7 @@ class OpenAnalizeCSV():
         for statement in printList:
             print(statement)
 
-        print("CREATING FILE IN LOCATION", self.destPathFile) 
+        print(f"CREATING FILE IN LOCATION {self.destPathFile}" ) 
 
         with open(self.destPathFile, "w") as txtFile:
             for statement in printList:
@@ -81,18 +81,16 @@ class OpenAnalizeCSV():
 
 if __name__ == "__main__":
     currentDirectory = os.getcwd() # Obtain current directory
-    sourcePath = currentDirectory + "\\Resources\\" 
-    sourceFileName = "budget_data.csv"
-    sourcePathFile = sourcePath + sourceFileName
+    sourcePath = currentDirectory + "/Resources/" 
+    sourcePathFile = sourcePath + "budget_data.csv"
     
     if not os.path.isfile(sourcePathFile):
         print("SOURCE FILE DOES NOT EXIST. CORRECT THIS AND TRY AGAIN")
         OpenAnalizeCSV.endScript()
 
-    destPath = currentDirectory + "\\analysis\\"
+    destPath = currentDirectory + "/analysis/"
     if not os.path.exists(destPath): # Check if destination location exists, else create it
         os.makedirs(destPath)
 
-    destFileName = "Financial Analysis.txt"
-    destPathFile = destPath + destFileName
+    destPathFile = destPath + "Financial Analysis.txt"
     createTextFile = OpenAnalizeCSV(sourcePathFile, destPathFile, sourcePath)
