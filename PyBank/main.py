@@ -2,11 +2,12 @@ import csv
 import os
 import traceback
 
-class OpenAnalizeCSV():
-    def __init__(self, sourcePathFile = None, destPathFile = None, sourcePath = None):
+class OpenParseCSV():
+    def __init__(self, sourcePathFile = None, destPathFile = None, sourcePath = None, destPath = None):
         self.sourcePathFile = sourcePathFile 
         self.destPathFile = destPathFile
         self.sourcePath = sourcePath
+        self.destPath = destPath
         try:
             self.analizeFile()
         except:
@@ -16,37 +17,36 @@ class OpenAnalizeCSV():
         try:
             self.printAndOutputFile()                                                                                                                                     
         except:
-            print(f"Something went wrong. Verify the source file exists in {self.sourcePath}, also verify you do not have the file {self.destPathFile} open if it already exists and try running the script again") 
+            print(f"Something went wrong. Verify the destination location still exists, inspect {self.destPath} , perhaps another application deleted this location.") 
             traceback.print_exc()
             return
 
     def analizeFile(self):
-        dictOfChanges = dict()
+        dictOfChanges = dict()  # create a dictionary, 2 lists and a counter for the total number of months
         listOfProfitLoses = list()
         changeList = list()
-        totalNumberOMonths = 0
+        totalNumberOfMonths = 0
         with open(self.sourcePathFile,"r") as csvfile: 
-            contents = csv.reader(csvfile)  #Read the CSV file
-            next(csvfile) # This is the tile row, skipping it. S
-            fRow = next(csvfile).split(",") # Extract the first Row to get value and date. 
-            # fDate = fRow[0] #Not needed, so I commented it out. 
-            oldValue = int((fRow[1]).replace("\n",""))
-            fValue = oldValue # this is to add it to the total value at the end since the next function removes the first row
-            for row in contents:  #iterate through hte CSV file to collect data and make calculations, contents now is missing the title and the first value.
+            contents = csv.reader(csvfile)  # Read the CSV file
+            next(csvfile) # This is the tile row, skipping it.
+            fRow = next(csvfile).split(",") # Extract the first Row to get value for change calculation
+            oldValue = int((fRow[1]).replace("\n","")) # remove unwanted escape, new row characters "\n" 
+            fValue = oldValue # keeping the first value to add it to the total value at the end since the next function removes the first row
+            for row in contents:  #iterate through hte CSV file to collect data and make calculations, content is now is missing the title and the first value.
                 profitLoses = int(row[1])
                 changeCalc = profitLoses - oldValue
                 changeList.append(changeCalc)
                 dictOfChanges.update({changeCalc : row[0]})  #build a dictionary to get the highest and lowest change in profit at the end. 
-                totalNumberOMonths += 1
+                totalNumberOfMonths += 1
                 listOfProfitLoses.append(int(profitLoses))
                 oldValue = profitLoses
 
-        self.totalNumberOMonths = str(totalNumberOMonths  + 1) # total months variable plus one since the first row was removed at the begining.  
-        self.totalAmount = "$" + str(sum(listOfProfitLoses) + fValue) # sum of values plus the first value that again was removed by the next function
-        self.averageChange = "$" + str(round(sum(changeList) / len(changeList), 2))
-        self.greatestIncrease = max(changeList)
+        self.totalNumberOfMonths = str(totalNumberOfMonths  + 1) # total months plus one since the first row was removed at the begining by the next function.  
+        self.totalAmountText = "$" + str(sum(listOfProfitLoses) + fValue) # sum of values plus the first value that was also removed by the next function
+        self.averageChangeText = "$" + str(round(sum(changeList) / len(changeList), 2))
+        self.greatestIncrease = max(changeList) #extracting the greatest increase and decrease values and dates from the dictionary built in the for loop. 
         self.greatestDecrease = min(changeList)
-        self.gIncreaseDate = dictOfChanges[self.greatestIncrease] #extracting the greatest inc and dec from the dictionary built in the loop. 
+        self.gIncreaseDate = dictOfChanges[self.greatestIncrease] 
         self.gDecreaseDate = dictOfChanges[self.greatestDecrease]
         self.greatestIncreaseText = self.gIncreaseDate + " ($" + str(max(changeList)) + ")"
         self.greatestDecreaseText = self.gDecreaseDate + " ($" + str(min(changeList)) + ")"
@@ -57,18 +57,21 @@ class OpenAnalizeCSV():
             "",
             "----------------------------",
             "",
-            "Total Months: " + self.totalNumberOMonths,
-            "Total: " + self.totalAmount,
-            "Average Change: " + self.averageChange,
+            "Total Months: " + self.totalNumberOfMonths,
+            "",
+            "Total: " + self.totalAmountText,
+            "",
+            "Average Change: " + self.averageChangeText,
+            "",
             "Greatest Increase in Profits: " + self.greatestIncreaseText,
+            "",
             "Greatest Decrease in Profits: " + self.greatestDecreaseText,
-            "```",
+            "",
         ]
 
-        for statement in printList:
-            print(statement)
+        for statement in printList: print(statement)
 
-        print(f"CREATING FILE IN LOCATION {self.destPathFile}" ) 
+        print(f'CREATING FILE "Financial Analysis.txt" IN LOCATION {self.destPath}') 
 
         with open(self.destPathFile, "w") as txtFile:
             for statement in printList:
@@ -85,11 +88,11 @@ if __name__ == "__main__":
     sourcePathFile = os.path.abspath(os.getcwd() + "/Resources/budget_data.csv") # get source path 
     
     if not os.path.isfile(sourcePathFile):
-        print("SOURCE FILE DOES NOT EXIST. CORRECT THIS AND TRY AGAIN")
-        OpenAnalizeCSV.endScript()
+        print("SOURCE FILE DOES NOT EXIST. MAKE SURE THIS PATH EXISTS: {sourcePathFile}")
+        OpenParseCSV.endScript()
 
     destPath = os.path.abspath(os.getcwd() + "/analysis/")
-    if not os.path.exists(destPath): # Check if destination location exists, else create it, but should exist. 
+    if not os.path.exists(destPath): # Check if destination location exists, else create it, but if the challenge documentation was followed it should already exist. 
         os.makedirs(destPath)
 
-    createTextFile = OpenAnalizeCSV(sourcePathFile, destPathFile=(destPath + "/Financial Analysis.txt"), sourcePath=(os.getcwd() + "/Resources/"))
+    OpenParseCSV(sourcePathFile, destPathFile=(destPath + "/Financial Analysis.txt"), sourcePath=(os.getcwd() + "/Resources/"), destPath = destPath)
