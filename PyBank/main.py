@@ -54,7 +54,9 @@ class OpenAnalizeCSV():
     def printAndOutputFile(self):
         printList = [   # concoct the list to print and to make the file 
             "Financial Analysis",
+            "",
             "----------------------------",
+            "",
             "Total Months: " + self.totalNumberOMonths,
             "Total: " + self.totalAmount,
             "Average Change: " + self.averageChange,
@@ -80,17 +82,14 @@ class OpenAnalizeCSV():
 
 
 if __name__ == "__main__":
-    currentDirectory = os.getcwd() # Obtain current directory
-    sourcePath = currentDirectory + "/Resources/" 
-    sourcePathFile = sourcePath + "budget_data.csv"
+    sourcePathFile = os.path.abspath(os.getcwd() + "/Resources/budget_data.csv") # get source path 
     
     if not os.path.isfile(sourcePathFile):
         print("SOURCE FILE DOES NOT EXIST. CORRECT THIS AND TRY AGAIN")
         OpenAnalizeCSV.endScript()
 
-    destPath = currentDirectory + "/analysis/"
-    if not os.path.exists(destPath): # Check if destination location exists, else create it
+    destPath = os.path.abspath(os.getcwd() + "/analysis/")
+    if not os.path.exists(destPath): # Check if destination location exists, else create it, but should exist. 
         os.makedirs(destPath)
 
-    destPathFile = destPath + "Financial Analysis.txt"
-    createTextFile = OpenAnalizeCSV(sourcePathFile, destPathFile, sourcePath)
+    createTextFile = OpenAnalizeCSV(sourcePathFile, destPathFile=(destPath + "/Financial Analysis.txt"), sourcePath=(os.getcwd() + "/Resources/"))

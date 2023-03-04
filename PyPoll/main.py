@@ -30,34 +30,39 @@ class OpenAnalizeCSV():
                 ballotId.append(row[0]) 
                 candidate.append((row[2]).replace("\n",""))
 
-        duplicatesDict = {}
+        candidatesDict = {}
         for cand in set(candidate): # set is a data type used to store multiple items in a single variable
-            duplicatesDict[cand] = candidate.count(cand) # count each candidates instances and add them to the duplicatesDict dictionary
+            if 'CANDIDATE' in cand.upper(): #Skip the title
+                continue
+            candidatesDict[cand] = candidate.count(cand) # count each candidates instances and add them to the duplicatesDict dictionary
 
         self.totalVotes = len(ballotId) # total votes 
-        self.firstPlaceName = max(duplicatesDict, key = duplicatesDict.get)
-        self.firstPlaceText = max(duplicatesDict, key = duplicatesDict.get) + ": " + str(round(((max(duplicatesDict.values()) / self.totalVotes)*100),3)) + "% (" + str(max(duplicatesDict.values())) +")"
-        self.lastPlaceName = min(duplicatesDict, key = duplicatesDict.get)
-        self.lastPlaceText = min(duplicatesDict, key = duplicatesDict.get) + ": " + str(round(((min(duplicatesDict.values()) / self.totalVotes)*100),3)) + "% (" + str(min(duplicatesDict.values())) +")"
-        del duplicatesDict[self.firstPlaceName] #remove winner and last place to get the middle one. 
-        del duplicatesDict[self.lastPlaceName]
-        self.middlePlaceText = list(duplicatesDict.keys())[0] +": "+str(round(((int(list(duplicatesDict.values())[0]) / self.totalVotes)*100),3)) + "% (" + str(int(list(duplicatesDict.values())[0])) +")"
+        self.firstPlaceName = max(candidatesDict, key = candidatesDict.get)
+        self.firstPlaceText = max(candidatesDict, key = candidatesDict.get) + ": " + str(round(((max(candidatesDict.values()) / self.totalVotes)*100),3)) + "% (" + str(max(candidatesDict.values())) +")"
+        self.lastPlaceName = min(candidatesDict, key = candidatesDict.get)
+        self.lastPlaceText = min(candidatesDict, key = candidatesDict.get) + ": " + str(round(((min(candidatesDict.values()) / self.totalVotes)*100),3)) + "% (" + str(min(candidatesDict.values())) +")"
+        del candidatesDict[self.firstPlaceName] #remove winner and last place to get the middle one. 
+        del candidatesDict[self.lastPlaceName]
+        self.middlePlaceText = list(candidatesDict.keys())[0] +": "+str(round(((int(list(candidatesDict.values())[0]) / self.totalVotes)*100),3)) + "% (" + str(int(list(candidatesDict.values())[0])) +")"
 
     def printAndOutputFile(self):
         printList = [   # concoct the list to print and to make the file 
             "Election Results",
+            "",
             "-------------------------",
-            "                         ",
+            "",
             "Total Votes: " + str(self.totalVotes),
-            "                         ",
+            "",
             "-------------------------",
+            "",
             self.middlePlaceText,
             self.firstPlaceText,
             self.lastPlaceText,
+            "",
             "-------------------------",
-            "                         ",
+            "",
             "Winner: " + self.firstPlaceName,
-            "                         ",
+            "",
             "-------------------------",
         ]
 
@@ -77,17 +82,14 @@ class OpenAnalizeCSV():
         return  
 
 if __name__ == "__main__":
-    currentDirectory = os.getcwd() # Obtain current directory
-    sourcePath = currentDirectory + "/Resources/" 
-    sourcePathFile = sourcePath + "election_data.csv"
+    sourcePathFile = os.path.abspath(os.getcwd() + "/Resources/election_data.csv") # get source path 
     
     if not os.path.isfile(sourcePathFile):
         print("SOURCE FILE DOES NOT EXIST. CORRECT THIS AND TRY AGAIN")
         OpenAnalizeCSV.endScript()
 
-    destPath = currentDirectory + "/analysis/"
-    if not os.path.exists(destPath): # Check if destination location exists, else create it
+    destPath = os.path.abspath(os.getcwd() + "/analysis/")
+    if not os.path.exists(destPath): # Check if destination location exists, else create it, but should exist. 
         os.makedirs(destPath)
 
-    destPathFile = destPath + "Election Results.txt"
-    createTextFile = OpenAnalizeCSV(sourcePathFile, destPathFile, sourcePath)
+    createTextFile = OpenAnalizeCSV(sourcePathFile, destPathFile=(destPath + "/Election Results.txt"), sourcePath=(os.getcwd() + "/Resources/"))
