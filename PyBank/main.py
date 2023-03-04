@@ -11,7 +11,7 @@ class OpenParseCSV():
         try:
             self.analizeFile()
         except:
-            print("Something went wrong. Verify the source file exists in", self.sourcePath, "and try running the script again") #Nother printing methos that provides padding and is also easy
+            print("Something went wrong. Verify the source file exists in", self.sourcePath, "and try running the script again") #Another printing methos that automatically provides spaces
             traceback.print_exc()
             return
         try:
