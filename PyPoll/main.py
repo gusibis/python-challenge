@@ -25,7 +25,7 @@ class OpenParseCSV():
         self.candidatesDict = {}
         for cand in set(self.candidate): # set is a data type used to store multiple items in a single variable https://realpython.com/python-sets/  https://www.w3schools.com/python/python_sets.asp
             if 'CANDIDATE' in cand.upper(): continue #Skip the title   
-            self.self.candidatesDict[cand] = self.candidate.count(cand) # count each candidates instances from the set and put them in the candidatesDict dictionary
+            self.candidatesDict[cand] = self.candidate.count(cand) # count each candidates instances from the set and put them in the candidatesDict dictionary
         
         self.totalVotes = len(self.ballotId) # total votes can also be calculated 
         # self.totalVotes = sum(candidatesDict.values()) # Could have gotten the total votes like this also
